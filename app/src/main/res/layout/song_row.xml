@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:background="?android:attr/selectableItemBackground"
+    android:padding="5dp"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/iv_artwork"
+        android:src="@drawable/music_placeholder"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_centerVertical="true"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:text="Titre de la chanson"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:paddingRight="50dp"
+        android:paddingEnd="50dp"
+        android:layout_toRightOf="@id/iv_artwork"
+        android:layout_toEndOf="@id/iv_artwork"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tv_artist"
+        android:text="Artiste"
+        android:layout_toRightOf="@id/iv_artwork"
+        android:layout_toEndOf="@id/iv_artwork"
+        android:layout_below="@id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tv_duration"
+        android:text="3:05"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/iv_play_active"
+        android:src="@drawable/ic_play_circle_outline_white"
+        android:visibility="invisible"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/tv_duration"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
+
+</RelativeLayout>

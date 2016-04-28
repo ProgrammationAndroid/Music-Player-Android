@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_pause_circle_outline_black"
+        android:state_focused="true"
+        android:state_pressed="true" />
+    <item android:drawable="@drawable/ic_pause_circle_outline_black"
+        android:state_focused="false"
+        android:state_pressed="true" />
+    <item android:drawable="@drawable/ic_pause_circle_outline_black"
+        android:state_focused="true" />
+    <item android:drawable="@drawable/ic_pause_circle_outline_white"
+        android:state_focused="false"
+        android:state_pressed="false" />
+</selector>
