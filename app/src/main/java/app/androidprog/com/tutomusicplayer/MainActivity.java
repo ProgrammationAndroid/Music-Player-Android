@@ -2,6 +2,8 @@ package app.androidprog.com.tutomusicplayer;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -9,18 +11,46 @@ import com.android.volley.RequestQueue;
 
 import java.util.ArrayList;
 
+import app.androidprog.com.tutomusicplayer.Adapter.SongAdapter;
 import app.androidprog.com.tutomusicplayer.Model.Song;
 import app.androidprog.com.tutomusicplayer.Request.SoundcloudApiRequest;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "APP";
+    private RecyclerView recycler;
+    private SongAdapter mAdapter;
+    private ArrayList<Song> songList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Initialisation des vues
+        initializeViews();
+        //Requête récupérant les chansons
         getSongList();
+
+        songList = new ArrayList<>();
+
+        recycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        mAdapter = new SongAdapter(getApplicationContext(), songList, new SongAdapter.RecyclerItemClickListener() {
+            @Override
+            public void onClickListener(Song song, int position) {
+                Toast.makeText(MainActivity.this, song.getTitle(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        recycler.setAdapter(mAdapter);
+
+
+
+
+    }
+
+    private void initializeViews(){
+
+        recycler = (RecyclerView) findViewById(R.id.recycler);
     }
 
     public void getSongList(){
@@ -30,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
         request.getSongList(new SoundcloudApiRequest.SoundcloudInterface() {
             @Override
             public void onSuccess(ArrayList<Song> songs) {
-                Log.d(TAG, "onSuccess: " + songs);
+                songList.addAll(songs);
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -39,4 +70,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }
