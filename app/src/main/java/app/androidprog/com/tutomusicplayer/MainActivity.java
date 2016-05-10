@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recycler;
     private SongAdapter mAdapter;
     private ArrayList<Song> songList;
+    private int currentIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClickListener(Song song, int position) {
                 Toast.makeText(MainActivity.this, song.getTitle(), Toast.LENGTH_SHORT).show();
+                changeSelectedSong(position);
             }
         });
         recycler.setAdapter(mAdapter);
@@ -60,8 +62,10 @@ public class MainActivity extends AppCompatActivity {
         request.getSongList(new SoundcloudApiRequest.SoundcloudInterface() {
             @Override
             public void onSuccess(ArrayList<Song> songs) {
+                currentIndex = 0;
                 songList.addAll(songs);
                 mAdapter.notifyDataSetChanged();
+                mAdapter.setSelectedPosition(0);
             }
 
             @Override
@@ -69,6 +73,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void changeSelectedSong(int index){
+        mAdapter.notifyItemChanged(mAdapter.getSelectedPosition());
+        currentIndex = index;
+        mAdapter.setSelectedPosition(currentIndex);
+        mAdapter.notifyItemChanged(currentIndex);
     }
 
 }

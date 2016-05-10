@@ -1,8 +1,8 @@
 package app.androidprog.com.tutomusicplayer.Adapter;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,12 +14,15 @@ import java.util.ArrayList;
 
 import app.androidprog.com.tutomusicplayer.Model.Song;
 import app.androidprog.com.tutomusicplayer.R;
+import app.androidprog.com.tutomusicplayer.Utility.Utility;
+
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
     private Context context;
     private ArrayList<Song> songList;
     private RecyclerItemClickListener listener;
+    private int selectedPosition;
 
     public SongAdapter(Context context, ArrayList<Song> songList, RecyclerItemClickListener listener){
 
@@ -43,9 +46,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         Song song = songList.get(position);
         if(song != null){
 
+            if(selectedPosition == position){
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
+                holder.iv_play_active.setVisibility(View.VISIBLE);
+            }else{
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                holder.iv_play_active.setVisibility(View.INVISIBLE);
+            }
+
             holder.tv_title.setText(song.getTitle());
             holder.tv_artist.setText(song.getArtist());
-            holder.tv_duration.setText(String.valueOf(song.getDuration()));
+            String duration = Utility.convertDuration(song.getDuration());
+            holder.tv_duration.setText(duration);
             Picasso.with(context).load(song.getArtworkUrl()).placeholder(R.drawable.music_placeholder).into(holder.iv_artwork);
 
             holder.bind(song, listener);
@@ -89,4 +101,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         void onClickListener(Song song, int position);
     }
 
+    public void setSelectedPosition(int selectedPosition) {
+        this.selectedPosition = selectedPosition;
+    }
+
+    public int getSelectedPosition() {
+        return selectedPosition;
+    }
 }
