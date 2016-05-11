@@ -49,7 +49,7 @@ public class SoundcloudApiRequest {
                             String artworkUrl = songObject.getString("artwork_url");
                             String streamUrl = songObject.getString("stream_url");
                             long duration = songObject.getLong("duration");
-                            int playbackCount = songObject.getInt("playback_count");
+                            int playbackCount = songObject.has("playback_count") ? songObject.getInt("playback_count") : 0;
                             JSONObject user = songObject.getJSONObject("user");
                             String artist = user.getString("username");
 

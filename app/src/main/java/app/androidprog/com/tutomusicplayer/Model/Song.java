@@ -1,6 +1,8 @@
 package app.androidprog.com.tutomusicplayer.Model;
 
-public class Song {
+import android.support.annotation.NonNull;
+
+public class Song implements Comparable<Song>{
 
     private long id;
     private String title;
@@ -46,5 +48,10 @@ public class Song {
 
     public int getPlaybackCount() {
         return playbackCount;
+    }
+
+    @Override
+    public int compareTo(@NonNull Song another) {
+        return another.playbackCount - this.playbackCount;
     }
 }
