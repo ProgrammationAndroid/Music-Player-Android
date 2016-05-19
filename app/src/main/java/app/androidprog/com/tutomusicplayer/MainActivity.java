@@ -2,6 +2,7 @@ package app.androidprog.com.tutomusicplayer;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,11 +35,12 @@ public class MainActivity extends AppCompatActivity {
     private SongAdapter mAdapter;
     private ArrayList<Song> songList;
     private int currentIndex;
-    private TextView tb_title, tb_duration;
+    private TextView tb_title, tb_duration, tv_time;
     private ImageView iv_play, iv_next, iv_previous;
     private ProgressBar pb_loader, pb_main_loader;
     private MediaPlayer mediaPlayer;
     private long currentSongLength;
+    private SeekBar seekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new SongAdapter(getApplicationContext(), songList, new SongAdapter.RecyclerItemClickListener() {
             @Override
             public void onClickListener(Song song, int position) {
-                Toast.makeText(MainActivity.this, song.getTitle(), Toast.LENGTH_SHORT).show();
                 changeSelectedSong(position);
                 prepareSong(song);
             }
@@ -70,6 +72,44 @@ public class MainActivity extends AppCompatActivity {
             public void onPrepared(MediaPlayer mp) {
                 //Lancer la chanson
                 togglePlay(mp);
+            }
+        });
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                if(currentIndex + 1 < songList.size()){
+                    Song next = songList.get(currentIndex + 1);
+                    changeSelectedSong(currentIndex+1);
+                    prepareSong(next);
+                }else{
+                    Song next = songList.get(0);
+                    changeSelectedSong(0);
+                    prepareSong(next);
+                }
+            }
+        });
+
+        //Gestion de la seekbar
+        handleSeekbar();
+    }
+
+    private void handleSeekbar(){
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (mediaPlayer != null && fromUser) {
+                    mediaPlayer.seekTo(progress * 1000);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
     }
@@ -105,6 +145,18 @@ public class MainActivity extends AppCompatActivity {
             tb_title.setVisibility(View.VISIBLE);
             mp.start();
             iv_play.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.selector_pause));
+            final Handler mHandler = new Handler();
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    seekBar.setMax((int) currentSongLength / 1000);
+                    int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                    seekBar.setProgress(mCurrentPosition);
+                    tv_time.setText(Utility.convertDuration((long)mediaPlayer.getCurrentPosition()));
+                    mHandler.postDelayed(this, 1000);
+
+                }
+            });
         }
 
     }
@@ -119,8 +171,10 @@ public class MainActivity extends AppCompatActivity {
         iv_previous = (ImageView) findViewById(R.id.iv_previous);
         pb_loader = (ProgressBar) findViewById(R.id.pb_loader);
         pb_main_loader = (ProgressBar) findViewById(R.id.pb_main_loader);
-
         recycler = (RecyclerView) findViewById(R.id.recycler);
+        seekBar = (SeekBar) findViewById(R.id.seekbar);
+        tv_time = (TextView) findViewById(R.id.tv_time);
+
     }
 
     public void getSongList(){
