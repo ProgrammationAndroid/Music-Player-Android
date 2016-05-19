@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private long currentSongLength;
     private SeekBar seekBar;
+    private boolean firstLaunch = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new SongAdapter(getApplicationContext(), songList, new SongAdapter.RecyclerItemClickListener() {
             @Override
             public void onClickListener(Song song, int position) {
+                firstLaunch = false;
                 changeSelectedSong(position);
                 prepareSong(song);
             }
@@ -91,6 +93,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Gestion de la seekbar
         handleSeekbar();
+
+        //Controle de la chanson
+        pushPlay();
+        pushPrevious();
+        pushNext();
     }
 
     private void handleSeekbar(){
@@ -202,6 +209,76 @@ public class MainActivity extends AppCompatActivity {
         currentIndex = index;
         mAdapter.setSelectedPosition(currentIndex);
         mAdapter.notifyItemChanged(currentIndex);
+    }
+
+    private void pushPlay(){
+        iv_play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(mediaPlayer.isPlaying() && mediaPlayer != null){
+                    iv_play.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.selector_play));
+                    mediaPlayer.pause();
+                }else{
+                    if(firstLaunch){
+                        Song song = songList.get(0);
+                        changeSelectedSong(0);
+                        prepareSong(song);
+                    }else{
+                        mediaPlayer.start();
+                        firstLaunch = false;
+                    }
+                    iv_play.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.selector_pause));
+                }
+
+            }
+        });
+    }
+
+    private void pushPrevious(){
+
+        iv_previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firstLaunch = false;
+                if(mediaPlayer != null){
+
+                    if(currentIndex - 1 >= 0){
+                        Song previous = songList.get(currentIndex - 1);
+                        changeSelectedSong(currentIndex - 1);
+                        prepareSong(previous);
+                    }else{
+                        changeSelectedSong(songList.size() - 1);
+                        prepareSong(songList.get(songList.size() - 1));
+                    }
+
+                }
+            }
+        });
+
+    }
+
+    private void pushNext(){
+
+        iv_next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firstLaunch = false;
+                if(mediaPlayer != null){
+
+                    if(currentIndex + 1 < songList.size()){
+                        Song next = songList.get(currentIndex + 1);
+                        changeSelectedSong(currentIndex + 1);
+                        prepareSong(next);
+                    }else{
+                        changeSelectedSong(0);
+                        prepareSong(songList.get(0));
+                    }
+
+                }
+            }
+        });
+
     }
 
 }
