@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="app.androidprog.com.tutomusicplayer.MainActivity">
 
     <ProgressBar
@@ -24,4 +25,17 @@
     </android.support.v7.widget.RecyclerView>
 
     <include layout="@layout/toolbar" android:id="@+id/toolbar" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/toolbar"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_menu_search"
+        app:fabSize="normal"
+        app:layout_anchor="@id/recycler"/>
+
 </RelativeLayout>

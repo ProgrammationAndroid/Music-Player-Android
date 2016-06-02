@@ -1,15 +1,19 @@
 package app.androidprog.com.tutomusicplayer;
 
+import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -42,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private long currentSongLength;
     private SeekBar seekBar;
     private boolean firstLaunch = true;
+    private FloatingActionButton fab_search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         //Initialisation des vues
         initializeViews();
         //Requête récupérant les chansons
-        getSongList();
+        getSongList("");
 
         songList = new ArrayList<>();
 
@@ -98,6 +103,14 @@ public class MainActivity extends AppCompatActivity {
         pushPlay();
         pushPrevious();
         pushNext();
+
+        //Gestion du click sur le bouton rechercher
+        fab_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createDialog();
+            }
+        });
     }
 
     private void handleSeekbar(){
@@ -128,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         tb_title.setVisibility(View.GONE);
         iv_play.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.selector_play));
         tb_title.setText(song.getTitle());
-        tb_duration.setText(Utility.convertDuration(song.getDuration()));
+        tv_time.setText(Utility.convertDuration(song.getDuration()));
         String stream = song.getStreamUrl()+"?client_id="+Config.CLIENT_ID;
         mediaPlayer.reset();
 
@@ -172,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
     private void initializeViews(){
 
         tb_title = (TextView) findViewById(R.id.tb_title);
-        tb_duration = (TextView) findViewById(R.id.tv_time);
         iv_play = (ImageView) findViewById(R.id.iv_play);
         iv_next = (ImageView) findViewById(R.id.iv_next);
         iv_previous = (ImageView) findViewById(R.id.iv_previous);
@@ -181,24 +193,29 @@ public class MainActivity extends AppCompatActivity {
         recycler = (RecyclerView) findViewById(R.id.recycler);
         seekBar = (SeekBar) findViewById(R.id.seekbar);
         tv_time = (TextView) findViewById(R.id.tv_time);
+        fab_search = (FloatingActionButton) findViewById(R.id.fab_search);
 
     }
 
-    public void getSongList(){
+    public void getSongList(String query){
         RequestQueue queue = VolleySingleton.getInstance(this).getRequestQueue();
         SoundcloudApiRequest request = new SoundcloudApiRequest(queue);
-
-        request.getSongList(new SoundcloudApiRequest.SoundcloudInterface() {
+        pb_main_loader.setVisibility(View.VISIBLE);
+        request.getSongList(query, new SoundcloudApiRequest.SoundcloudInterface() {
             @Override
             public void onSuccess(ArrayList<Song> songs) {
                 currentIndex = 0;
+                pb_main_loader.setVisibility(View.GONE);
+                songList.clear();
                 songList.addAll(songs);
                 mAdapter.notifyDataSetChanged();
                 mAdapter.setSelectedPosition(0);
+
             }
 
             @Override
             public void onError(String message) {
+                pb_main_loader.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -281,4 +298,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void createDialog(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        final View view = getLayoutInflater().inflate(R.layout.dialog_search, null);
+        builder.setTitle(R.string.rechercher);
+        builder.setView(view);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText et_search = (EditText) view.findViewById(R.id.et_search);
+                String search = et_search.getText().toString().trim();
+                if(search.length() > 0){
+                    getSongList(search);
+                }else{
+                    Toast.makeText(MainActivity.this, "Veuillez remplir le champ", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.create().show();
+
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(mediaPlayer != null){
+            mediaPlayer.release();
+        }
+        super.onDestroy();
+    }
 }
